@@ -24,10 +24,14 @@ def checkpar(string):
     if stack:
         return False
     return True
-        
+
+def eval(string):
+    result = 0
+    return result
 
 count = input("Zadejte pocet prikladu:")
 for i in range(int(count)):
     string = input("Zadejte priklad:")
     if not(checkpar(string)):
         print("ERROR")
+    
