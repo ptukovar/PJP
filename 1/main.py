@@ -31,5 +31,3 @@ for i in range(int(count)):
     string = input("Zadejte priklad:")
     if not(checkpar(string)):
         print("ERROR")
-    else:
-        print("OK")
