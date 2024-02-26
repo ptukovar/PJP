@@ -51,7 +51,7 @@ def calculate(expression):
             result *= numbers[i + 1]
         elif operator == '/':
             if numbers[i + 1] == 0:
-                raise ValueError("Division by zero!")
+                print("ERROR")
             result /= numbers[i + 1]
     
     return result
