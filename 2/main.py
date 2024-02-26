@@ -5,7 +5,8 @@ delimiters = {"(",")",";"}
 keywords = {"div","mod"}
 multi_line_input = """    -2 + (245 div 3);  // note
 2 mod 3 * hello"""
-string =multi_line_input#= input("Zadejte kod:")
+
+string =multi_line_input #= input("Zadejte kod:")
 lines = string.splitlines()
 j = 0
 skip = False
@@ -17,7 +18,7 @@ for line in lines:
             if not(temp == "")  and (line[i]=="" or line[i]==" "):
                 print("ID:",temp)
                 temp = ""
-            if not(temp2 == "")  and (line[i]=="" or line[i]==" "):
+            if not(temp2 == "") and (line[i]=="" or line[i]==" " or line[i] == ")"):
                 print("NUM:",temp2)
                 temp2 = ""
             if line[i:i+3] in keywords:
