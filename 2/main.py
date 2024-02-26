@@ -6,10 +6,14 @@ keywords = {"div","mod"}
 
 string = input("Zadejte kod:")
 temp = ""
+temp2 = ""
 for char in string:
     if not(temp == "")  and (char=="" or char==" "):
         print("ID:",temp)
         temp = ""
+    if not(temp2 == "")  and (char=="" or char==" "):
+        print("NUM:",temp2)
+        temp2 = ""
 
     if char in identifiers and not(char in numbers):
         temp += char 
@@ -18,10 +22,17 @@ for char in string:
     elif char in operators:
         print("OP:",char)
     elif char in numbers:
-        print("NUM:",char)
+        temp2 += char
     elif char in delimiters:
-        print("DEL:",char)
+        if char == ";":
+            print("DEL:","SEMICOLON")
+        else:
+            print("DEL:",char)
 
 if not(temp == ""):
     print("ID:",temp)
     temp = ""
+
+if not(temp2 == ""):
+    print("NUM:",temp2)
+    temp2 = ""
