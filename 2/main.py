@@ -6,7 +6,7 @@ keywords = {"div","mod"}
 multi_line_input = """    -2 + (245 div 3);  // note
 2 mod 3 * hello"""
 
-string =multi_line_input #= input("Zadejte kod:")
+string = multi_line_input #= input("Zadejte kod:")
 lines = string.splitlines()
 j = 0
 skip = False
