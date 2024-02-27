@@ -3,7 +3,7 @@ numbers = {"1","2","3","4","5","6","7","8","9","0"}
 operators = {"+","-","*","/","="}
 delimiters = {"(",")",";"}
 keywords = {"div","mod"}
-
+array = []
 filename = input("Zadejte nazev souboru:")
 try:
     f = open(filename, "r")
@@ -18,12 +18,15 @@ try:
             if skip == False:
                 if not(temp == "")  and (line[i]=="" or line[i]==" "):
                     print("ID:",temp)
+                    array.append("ID:"+temp)
                     temp = ""
                 if not(temp2 == "") and (line[i]=="" or line[i]==" " or line[i] == ")"):
                     print("NUM:",temp2)
+                    array.append("NUM:"+temp2)
                     temp2 = ""
                 if line[i:i+3] in keywords:
                     print("KEY:",line[i:i+3])
+                    array.append("KEY:"+line[i:i+3])
                     skip = True
                 elif line[i] in identifiers and not(line[i] in numbers):
                     temp += line[i] 
@@ -33,15 +36,19 @@ try:
                     break;    
                 elif line[i] in operators:
                     print("OP:",line[i])
+                    array.append("OP:"+line[i])
                 elif line[i] in numbers:
                     temp2 += line[i]
                 elif line[i] in delimiters:
                     if line[i] == ";":
                         print("DEL:","SEMICOLON")
+                        array.append("DEL:"+"SEMICOLON")
                     elif line[i] == "(":
                         print("DEL:","LPAR")
+                        array.append("DEL:"+"LPAR")
                     elif line[i] == ")":
                         print("DEL:","RPAR")   
+                        array.append("DEL:"+"RPAR")
             else:
                 j += 1	
                 if j == 2:
@@ -50,10 +57,13 @@ try:
 
         if not(temp == ""):
             print("ID:",temp)
+            array.append("ID:"+temp)
             temp = ""
 
         if not(temp2 == ""):
             print("NUM:",temp2)
+            array.append("NUM:"+temp2)
             temp2 = ""
-except:
+        print(array)
+except EOFError:
     print("Soubor nebyl nalezen")
