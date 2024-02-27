@@ -3,10 +3,10 @@ numbers = {"1","2","3","4","5","6","7","8","9","0"}
 operators = {"+","-","*","/","="}
 delimiters = {"(",")",";"}
 keywords = {"div","mod"}
-multi_line_input = """    -2 + (245 div 3);  // note
-2 mod 3 * hello"""
 
-string = multi_line_input #= input("Zadejte kod:")
+filename = input("Zadejte nazev souboru:")
+f = open(filename, "r")
+string =  f.read()
 lines = string.splitlines()
 j = 0
 skip = False
