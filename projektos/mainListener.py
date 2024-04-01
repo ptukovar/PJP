@@ -14,6 +14,7 @@ class mainListener(ParseTreeListener):
 
     # Exit a parse tree produced by mainParser#prog.
     def exitProg(self, ctx:mainParser.ProgContext):
+        print(ctx.expr().getText())
         pass
 
 
@@ -23,6 +24,7 @@ class mainListener(ParseTreeListener):
 
     # Exit a parse tree produced by mainParser#par.
     def exitPar(self, ctx:mainParser.ParContext):
+        ctx.getChild(1).getText()
         pass
 
 
@@ -32,6 +34,13 @@ class mainListener(ParseTreeListener):
 
     # Exit a parse tree produced by mainParser#add.
     def exitAdd(self, ctx:mainParser.AddContext):
+        left = ctx.getChild(0).getText()
+        right = ctx.getChild(2).getText()
+        operator = ctx.getChild(1).getText()
+        if operator == '+':
+            print(int(left) + int(right))
+        else:
+            print(int(left) - int(right))
         pass
 
 
@@ -41,6 +50,7 @@ class mainListener(ParseTreeListener):
 
     # Exit a parse tree produced by mainParser#oct.
     def exitOct(self, ctx:mainParser.OctContext):
+        ctx.OCT().getText(), 8
         pass
 
 
@@ -50,6 +60,13 @@ class mainListener(ParseTreeListener):
 
     # Exit a parse tree produced by mainParser#mul.
     def exitMul(self, ctx:mainParser.MulContext):
+        left = ctx.getChild(0).getText()
+        right = ctx.getChild(2).getText()
+        operator = ctx.getChild(1).getText()
+        if operator == '*':
+            print(int(left) * int(right))
+        else:
+            print(int(left) / int(right))
         pass
 
 
@@ -59,6 +76,7 @@ class mainListener(ParseTreeListener):
 
     # Exit a parse tree produced by mainParser#hexa.
     def exitHexa(self, ctx:mainParser.HexaContext):
+        ctx.HEXA().getText(), 16
         pass
 
 
@@ -68,6 +86,7 @@ class mainListener(ParseTreeListener):
 
     # Exit a parse tree produced by mainParser#int.
     def exitInt(self, ctx:mainParser.IntContext):
+        ctx.INT().getText(), 10
         pass
 
 
