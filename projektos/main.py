@@ -5,7 +5,7 @@ from mainParser import mainParser
 from mainVisitor import mainVisitor
 
 #na priste: unifikace int na float
-
+#listener je jednodussi, ale visitor je obecnejsi
 def main(argv):
     input_stream = FileStream(argv[1])
     lexer = mainLexer(input_stream)
