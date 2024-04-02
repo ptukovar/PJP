@@ -49,7 +49,7 @@ class mainVisitor(ParseTreeVisitor):
     def visitProg(self, ctx:mainParser.ProgContext):
         for child in ctx.getChildren():
             if child.getChildCount() > 0:
-                print(self.visit(child))
+                self.visit(child)
         return 0
 
 del mainParser
