@@ -15,7 +15,6 @@ class mainListener(ParseTreeListener):
     # Exit a parse tree produced by mainParser#prog.
     def exitProg(self, ctx:mainParser.ProgContext):
         print(ctx.expr().getText())
-        pass
 
 
     # Enter a parse tree produced by mainParser#par.
@@ -25,7 +24,6 @@ class mainListener(ParseTreeListener):
     # Exit a parse tree produced by mainParser#par.
     def exitPar(self, ctx:mainParser.ParContext):
         ctx.getChild(1).getText()
-        pass
 
 
     # Enter a parse tree produced by mainParser#add.
@@ -41,7 +39,6 @@ class mainListener(ParseTreeListener):
             print(int(left) + int(right))
         else:
             print(int(left) - int(right))
-        pass
 
 
     # Enter a parse tree produced by mainParser#oct.
@@ -51,7 +48,6 @@ class mainListener(ParseTreeListener):
     # Exit a parse tree produced by mainParser#oct.
     def exitOct(self, ctx:mainParser.OctContext):
         ctx.OCT().getText(), 8
-        pass
 
 
     # Enter a parse tree produced by mainParser#mul.
@@ -67,7 +63,6 @@ class mainListener(ParseTreeListener):
             print(int(left) * int(right))
         else:
             print(int(left) / int(right))
-        pass
 
 
     # Enter a parse tree produced by mainParser#hexa.
@@ -77,7 +72,6 @@ class mainListener(ParseTreeListener):
     # Exit a parse tree produced by mainParser#hexa.
     def exitHexa(self, ctx:mainParser.HexaContext):
         ctx.HEXA().getText(), 16
-        pass
 
 
     # Enter a parse tree produced by mainParser#int.
@@ -87,7 +81,6 @@ class mainListener(ParseTreeListener):
     # Exit a parse tree produced by mainParser#int.
     def exitInt(self, ctx:mainParser.IntContext):
         ctx.INT().getText(), 10
-        pass
 
 
 

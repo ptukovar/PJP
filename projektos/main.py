@@ -4,6 +4,8 @@ from mainLexer import mainLexer
 from mainParser import mainParser
 from mainVisitor import mainVisitor
 
+#na priste: unifikace int na float
+
 def main(argv):
     input_stream = FileStream(argv[1])
     lexer = mainLexer(input_stream)
