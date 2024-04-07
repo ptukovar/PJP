@@ -1,2 +1,1 @@
-012-10; 2 * (0xff+5);
-0x23e5-0x201;
+if (3<4) { write "condition was true"; }
