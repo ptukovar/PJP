@@ -1,39 +1,4 @@
 # Generated from pjp.g4 by ANTLR 4.13.0
-from enum import Enum
-import sys
-
-class Type(Enum):
-    INT = 1
-    FLOAT = 2
-    STRING = 3
-    BOOLEAN = 4
-    ERROR = 4
-
-class Symbol:
-    def __init__(self, name, type, value, line, column):
-        self.name = name
-        self.type = type
-        self.value = value
-        self.line = line
-        self.column = column
-
-class SymbolTable:
-    def __init__(self):
-        self.symbolTable = {}
-
-    def insert(self, symbol):
-        if symbol.name in self.symbolTable:
-            print(f"Symbol {symbol.name} already defined at line {self.symbolTable[symbol.name].line}, column {self.symbolTable[symbol.name].column}")
-            return False
-        self.symbolTable[symbol.name] = symbol
-        return True
-
-    def lookup(self, name):
-        return self.symbolTable.get(name, None)
-
-    def __str__(self):
-        return str(self.symbolTable)
-
 from antlr4 import *
 if "." in __name__:
     from .pjpParser import pjpParser
@@ -43,8 +8,6 @@ else:
 # This class defines a complete generic visitor for a parse tree produced by pjpParser.
 
 class pjpVisitor(ParseTreeVisitor):
-    def __init__(self):
-        self.symbolTable = SymbolTable()
 
     # Visit a parse tree produced by pjpParser#prog.
     def visitProg(self, ctx:pjpParser.ProgContext):
@@ -63,59 +26,11 @@ class pjpVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by pjpParser#assignmentTypeStatement.
     def visitAssignmentTypeStatement(self, ctx:pjpParser.AssignmentTypeStatementContext):
-        variableType = ctx.getChild(0).getText()
-        variableName = ctx.getChild(1).getText()
-        variableValue = ctx.getChild(3).getText()
-        if variableType == "int":
-            variableValue = int(variableValue)
-            variableType = Type.INT
-        elif variableType == "float":
-            variableValue = float(variableValue)
-            variableType = Type.FLOAT
-        elif variableType == "string":
-            variableValue = variableValue[1:-1]
-            variableType = Type.STRING
-        elif variableType == "bool":
-            variableValue = variableValue == "true"
-            variableType = Type.BOOLEAN
-        else:
-            print(f"Unknown type {variableType}")
-            variableType = Type.ERROR
-            return self.visitChildren(ctx)
-            
-
-        symbol = Symbol(variableName, variableType, variableValue, ctx.start.line, ctx.start.column)
-        
-        self.symbolTable.insert(symbol)
-        print(symbol.name, symbol.type, symbol.value)
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by pjpParser#assignmentStatement.
     def visitAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
-        variableName = ctx.getChild(0).getText()
-        symbol = self.symbolTable.lookup(variableName)
-        if symbol is None:
-            print(f"Symbol {variableName} not defined")
-            sys.exit(1)
-            return None
-        
-        variableValue = ctx.getChild(2).getText()
-
-        if symbol.type == Type.INT:
-            variableValue = int(variableValue)
-        elif symbol.type == Type.FLOAT:
-            variableValue = float(variableValue)
-        elif symbol.type == Type.STRING:
-            variableValue = variableValue[1:-1]
-        elif symbol.type == Type.BOOL:
-            variableValue = variableValue == "true"
-        else:
-            print(f"Unknown type {symbol.type}")
-            return None
-        
-        symbol.value = variableValue
-        print(symbol.name, symbol.type, symbol.value)
         return self.visitChildren(ctx)
 
 

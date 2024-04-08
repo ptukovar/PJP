@@ -15,8 +15,9 @@ statement: SEMICOLON
     | forStatement
     | assignmentStatement
     ;
-assignmentTypeStatement: TYPE variables (ASSIGN expression)? (COMMA variables (ASSIGN expression)?)* SEMICOLON;
-assignmentStatement: variables (ASSIGN variables)* ASSIGN expression SEMICOLON;
+
+assignmentTypeStatement: TYPE variables (ASSIGN expression)? (COMMA variables (ASSIGN expression)?)* SEMICOLON | TYPE variables ASSIGN (PLUS | MINUS | TIMES | DIVIDE | MOD) expression SEMICOLON;
+assignmentStatement: variables (ASSIGN variables)* ASSIGN expression SEMICOLON | variables ASSIGN (PLUS | MINUS | TIMES | DIVIDE | MOD) expression SEMICOLON;
 readStatement: READ variables (COMMA variables)* SEMICOLON;
 writeStatement: WRITE expression (COMMA expression)* SEMICOLON;
 block: LBRACE statement* RBRACE;

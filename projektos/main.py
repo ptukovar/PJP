@@ -3,6 +3,7 @@ from antlr4 import *
 from pjpLexer import pjpLexer
 from pjpParser import pjpParser
 from pjpVisitor import pjpVisitor
+from pjpImplVisitor import pjpImplVisitor
 
 #na priste: unifikace int na float
 #visitor je obecnejsi
@@ -23,8 +24,9 @@ def pjp(argv):
     if parser.getNumberOfSyntaxErrors() > 0:
         print("syntax errors")
     else:
-        vinterp = pjpVisitor()
-        vinterp.visit(tree)
+        vinterp = pjpImplVisitor()
+        print(vinterp.visit(tree))
 
 if __name__ == '__main__':
     pjp(sys.argv)
+    
