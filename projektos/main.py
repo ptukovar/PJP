@@ -17,7 +17,7 @@ from pjpVisitor import pjpVisitor
 #int i;
 #for(i=0;i<10;i=i+1){}
 
-def main(argv):
+def pjp(argv):
     input_stream = FileStream(argv[1])
     lexer = pjpLexer(input_stream)
     stream = CommonTokenStream(lexer)
@@ -31,4 +31,4 @@ def main(argv):
         vinterp.visit(tree)
 
 if __name__ == '__main__':
-    main(sys.argv)
+    pjp(sys.argv)

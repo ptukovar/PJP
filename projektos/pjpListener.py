@@ -17,15 +17,6 @@ class pjpListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by pjpParser#literals.
-    def enterLiterals(self, ctx:pjpParser.LiteralsContext):
-        pass
-
-    # Exit a parse tree produced by pjpParser#literals.
-    def exitLiterals(self, ctx:pjpParser.LiteralsContext):
-        pass
-
-
     # Enter a parse tree produced by pjpParser#variables.
     def enterVariables(self, ctx:pjpParser.VariablesContext):
         pass
@@ -41,6 +32,15 @@ class pjpListener(ParseTreeListener):
 
     # Exit a parse tree produced by pjpParser#statement.
     def exitStatement(self, ctx:pjpParser.StatementContext):
+        pass
+
+
+    # Enter a parse tree produced by pjpParser#assignmentStatement.
+    def enterAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
+        pass
+
+    # Exit a parse tree produced by pjpParser#assignmentStatement.
+    def exitAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
         pass
 
 
@@ -107,12 +107,12 @@ class pjpListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by pjpParser#condition.
-    def enterCondition(self, ctx:pjpParser.ConditionContext):
+    # Enter a parse tree produced by pjpParser#literals.
+    def enterLiterals(self, ctx:pjpParser.LiteralsContext):
         pass
 
-    # Exit a parse tree produced by pjpParser#condition.
-    def exitCondition(self, ctx:pjpParser.ConditionContext):
+    # Exit a parse tree produced by pjpParser#literals.
+    def exitLiterals(self, ctx:pjpParser.LiteralsContext):
         pass
 
 

@@ -1,8 +1,6 @@
 grammar pjp;
 
-prog: statement+ EOF;
-
-literals: INTEGER | FLOAT | STRING | BOOLEAN;
+prog: (statement)+ EOF;
 
 variables: VARIABLE;
 
@@ -15,28 +13,31 @@ statement: SEMICOLON
     | ifStatement
     | whileStatement
     | forStatement
+    | assignmentStatement
     ;
 
+assignmentStatement: variables (ASSIGN variables)* ASSIGN expression SEMICOLON;
 readStatement: READ variables (COMMA variables)* SEMICOLON;
 writeStatement: WRITE expression (COMMA expression)* SEMICOLON;
 block: LBRACE statement* RBRACE;
-ifStatement: IF LPAREN condition RPAREN statement (ELSE statement)?;
-whileStatement: WHILE LPAREN condition RPAREN statement;
-forStatement: FOR LPAREN expression SEMICOLON condition SEMICOLON expression RPAREN statement;
+ifStatement: IF LPAREN expression RPAREN statement (ELSE statement)?;
+whileStatement: WHILE LPAREN expression RPAREN statement;
+forStatement: FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN statement;
 
-expression: INTEGER
+expression: MINUS expression
+    | STRING DOT STRING
+    | INTEGER
     | FLOAT
     | STRING
     | BOOLEAN
     | variables
+    | LPAREN expression RPAREN
     | expression PLUS expression
     | expression MINUS expression
     | expression TIMES expression
     | expression DIVIDE expression
     | expression MOD expression
-    ;
-
-condition: expression EQ expression
+    | expression EQ expression
     | expression NEQ expression
     | expression LT expression
     | expression LEQ expression
@@ -44,24 +45,17 @@ condition: expression EQ expression
     | expression GEQ expression
     | expression AND expression
     | expression OR expression
-    | NOT condition
+    | NOT expression
     ;
 
-SEMICOLON: ';';
-COMMA: ',';
-TYPE: 'int' | 'float' | 'string' | 'bool';
-VARIABLE: [a-zA-Z_][a-zA-Z0-9_]*;
-
-INTEGER: [0-9]+;
-FLOAT: [0-9]+'.'[0-9]+;
-STRING: '"' ~'"'* '"';
-BOOLEAN: 'true' | 'false';
-
+literals: INTEGER | FLOAT | STRING | BOOLEAN;
+DOT: '.';
 PLUS: '+';
 MINUS: '-';
 TIMES: '*';
 DIVIDE: '/';
 MOD: '%';
+
 AND: '&&';
 OR: '||';
 EQ: '==';
@@ -71,10 +65,12 @@ LEQ: '<=';
 GT: '>';
 GEQ: '>=';
 NOT: '!';
+
 LPAREN: '(';
 RPAREN: ')';
 LBRACE: '{';
 RBRACE: '}';
+ASSIGN: '=';
 
 IF: 'if';
 ELSE: 'else';
@@ -83,6 +79,17 @@ FOR: 'for';
 READ: 'read';
 WRITE: 'write';
 
+SEMICOLON: ';';
+COMMA: ',';
+TYPE: 'int' | 'float' | 'string' | 'bool';
+
+INTEGER: [0-9]+;
+FLOAT: [0-9]+'.'[0-9]+;
+STRING: '"' ~'"'* '"';
+BOOLEAN: 'true' | 'false';
+
 WHITESPACE: [ \t\r\n]+ -> skip;
 COMMENT: '//' ~[\r\n]* -> skip;
 COMMENT_LINE: '/*' .*? '*/' -> skip;
+
+VARIABLE: [a-zA-Z_]+;

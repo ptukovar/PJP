@@ -14,11 +14,6 @@ class pjpVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#literals.
-    def visitLiterals(self, ctx:pjpParser.LiteralsContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by pjpParser#variables.
     def visitVariables(self, ctx:pjpParser.VariablesContext):
         return self.visitChildren(ctx)
@@ -26,6 +21,11 @@ class pjpVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by pjpParser#statement.
     def visitStatement(self, ctx:pjpParser.StatementContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#assignmentStatement.
+    def visitAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
         return self.visitChildren(ctx)
 
 
@@ -64,8 +64,8 @@ class pjpVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#condition.
-    def visitCondition(self, ctx:pjpParser.ConditionContext):
+    # Visit a parse tree produced by pjpParser#literals.
+    def visitLiterals(self, ctx:pjpParser.LiteralsContext):
         return self.visitChildren(ctx)
 
 
