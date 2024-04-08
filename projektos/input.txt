@@ -1,3 +1,6 @@
-int i = 10;
-int j = 5;
-i = i + j - 3 * 2;
+int i, j=5, k = 42;
+float x;
+string y = "testingos";
+i = 5;
+j = 7;
+k = 5 - 8.8;

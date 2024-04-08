@@ -25,7 +25,7 @@ def pjp(argv):
         print("syntax errors")
     else:
         vinterp = pjpImplVisitor()
-        print(vinterp.visit(tree))
+        vinterp.visit(tree)
 
 if __name__ == '__main__':
     pjp(sys.argv)
