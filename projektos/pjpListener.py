@@ -35,6 +35,15 @@ class pjpListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by pjpParser#assignmentTypeStatement.
+    def enterAssignmentTypeStatement(self, ctx:pjpParser.AssignmentTypeStatementContext):
+        pass
+
+    # Exit a parse tree produced by pjpParser#assignmentTypeStatement.
+    def exitAssignmentTypeStatement(self, ctx:pjpParser.AssignmentTypeStatementContext):
+        pass
+
+
     # Enter a parse tree produced by pjpParser#assignmentStatement.
     def enterAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
         pass

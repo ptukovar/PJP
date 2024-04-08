@@ -5,7 +5,7 @@ prog: (statement)+ EOF;
 variables: VARIABLE;
 
 statement: SEMICOLON
-    | TYPE variables (COMMA variables)* SEMICOLON
+    | assignmentTypeStatement
     | expression SEMICOLON
     | readStatement
     | writeStatement
@@ -15,7 +15,7 @@ statement: SEMICOLON
     | forStatement
     | assignmentStatement
     ;
-
+assignmentTypeStatement: TYPE variables (ASSIGN expression)? (COMMA variables (ASSIGN expression)?)* SEMICOLON;
 assignmentStatement: variables (ASSIGN variables)* ASSIGN expression SEMICOLON;
 readStatement: READ variables (COMMA variables)* SEMICOLON;
 writeStatement: WRITE expression (COMMA expression)* SEMICOLON;

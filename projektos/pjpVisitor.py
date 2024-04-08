@@ -24,6 +24,11 @@ class pjpVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by pjpParser#assignmentTypeStatement.
+    def visitAssignmentTypeStatement(self, ctx:pjpParser.AssignmentTypeStatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by pjpParser#assignmentStatement.
     def visitAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
         return self.visitChildren(ctx)
