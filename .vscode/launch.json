@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": "/workspaces/PJP/projektos/input.txt"//${command:pickArgs}
+            "args": "/workspaces/PJP/projektos/input.txt" //${command:pickArgs}
         }
     ]
 }
