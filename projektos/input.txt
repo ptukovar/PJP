@@ -1,6 +1,21 @@
-int i, j=5, k = 42;
+write "<Testing errors>";
+
+write "4) mod used with float";
+write "20 mod 3.0: ", 20 % 3.0;
+
+write "8) assignment of float to int";
+int x;
+x = 13.25;
+write "x=13.25: ", x;
+
+write "12) . only for strings";
+write "abc+10: ", "abc". "0";
+
+write "15) multiple declarations";
 float x;
-string y = "testingos";
-i = 5;
-j = 7;
-k = 5 - 8.8;
+
+write "18) missing declaration";
+y = 10;
+
+write "21) + wont work with strings";
+write "x+y", "x"+"y";

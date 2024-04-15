@@ -26,6 +26,7 @@ whileStatement: WHILE LPAREN expression RPAREN statement;
 forStatement: FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN statement;
 
 expression: MINUS expression
+    | ((TYPE)+ expression ASSIGN)+ expression expression | expression '?' expression ':' expression
     | STRING DOT STRING
     | INTEGER
     | FLOAT
@@ -45,7 +46,7 @@ expression: MINUS expression
     | expression GT expression
     | expression GEQ expression
     | expression AND expression
-    | expression OR expression
+    | expression OR expression 
     | NOT expression
     ;
 
@@ -79,7 +80,8 @@ WHILE: 'while';
 FOR: 'for';
 READ: 'read';
 WRITE: 'write';
-
+INCREMENT: '++';
+DECREMENT: '--';
 SEMICOLON: ';';
 COMMA: ',';
 TYPE: 'int' | 'float' | 'string' | 'bool';

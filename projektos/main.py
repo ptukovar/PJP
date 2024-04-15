@@ -14,6 +14,11 @@ from pjpImplVisitor import pjpImplVisitor
 #vzit tabulku symbolu a upravit
 #je to na webu
 
+
+#pridat ternarni operator if
+
+#vylepsit gramatiku
+
 def pjp(argv):
     input_stream = FileStream(argv[1])
     lexer = pjpLexer(input_stream)
