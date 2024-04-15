@@ -27,7 +27,6 @@ class SymbolTable(ParseTreeVisitor):
         if symbol.name in self.symbolTable:
             print(f"Symbol {symbol.name} already defined at line {self.symbolTable[symbol.name].line}, column {self.symbolTable[symbol.name].column}")
             sys.exit(1)
-            return False
         self.symbolTable[symbol.name] = symbol
         return True
 
@@ -36,7 +35,6 @@ class SymbolTable(ParseTreeVisitor):
         if symbol is None:
             print(f"Symbol {name} not defined")
             sys.exit(1)
-            return False
         symbol.value = value
         return True
 
@@ -57,7 +55,7 @@ class pjpImplVisitor(pjpVisitor):
 
     # Visit a parse tree produced by pjpParser#variables.
     def visitVariables(self, ctx:pjpParser.VariablesContext):
-        return self.visitChildren(ctx)
+        return self.symbolTable.lookup(ctx.getChild(0).getText())
 
 
     # Visit a parse tree produced by pjpParser#statement.
@@ -67,68 +65,77 @@ class pjpImplVisitor(pjpVisitor):
 
     # Visit a parse tree produced by pjpParser#assignmentTypeStatement.
     def visitAssignmentTypeStatement(self, ctx:pjpParser.AssignmentTypeStatementContext):
-        variableType = ctx.getChild(0).getText()
-        if variableType == 'int':
+        if ctx.TYPE().getText() == 'int':
             variableType = Type.INT
-        elif variableType == 'float':
+        elif ctx.TYPE().getText() == 'float':
             variableType = Type.FLOAT
-        elif variableType == 'string':
+        elif ctx.TYPE().getText() == 'string':
             variableType = Type.STRING
-        elif variableType == 'bool':
+        elif ctx.TYPE().getText() == 'bool':
             variableType = Type.BOOL
-        else:
-            print("Unknown type")
-            sys.exit(1)
 
-        for i in range(1, len(ctx.children), 2):
-            checker = str(ctx.getChild(i).getText())
-            if ctx.getChild(i).getText() == ',' or ctx.getChild(i).getText() == ';' or checker.isdigit() or checker.startswith("\""):
+        for i in range(1,ctx.getChildCount()-1):
+            value = None
+            if ctx.getChild(i-1).getText() == '=':
                 continue
-            if ctx.getChild(i+1).getText() == '=':
-                variableName = ctx.getChild(i).getText()
-                variableValue = ctx.getChild(i+2).getText()
-                self.symbolTable.insert(Symbol(variableName, variableType, variableValue, ctx.start.line, ctx.start.column))
-            else:
-                variableName = ctx.getChild(i).getText()
-                self.symbolTable.insert(Symbol(variableName, variableType, None, ctx.start.line, ctx.start.column))
+            if ctx.getChild(i).getText() == '=':
+                continue
+            elif ctx.getChild(i).getText() == ';':
+                continue
+            elif ctx.getChild(i).getText() == ',':
+                continue
+            elif ctx.getChild(i+1).getText() == '=':
+                value = ctx.getChild(i+2).getText()
+                if variableType == Type.INT:
+                    value = int(value)
+                elif variableType == Type.FLOAT:
+                    value = float(value)
+                elif variableType == Type.BOOL:
+                    if value == 'true':
+                        value = True
+                    elif value == 'false':
+                        value = False
+                elif variableType == Type.STRING:
+                    value = value
+            self.symbolTable.insert(Symbol(ctx.getChild(i).getText(), variableType, value, ctx.start.line, ctx.start.column))
             
-            print(self.symbolTable.symbolTable.get(variableName).name, 
-                  self.symbolTable.symbolTable.get(variableName).type, 
-                  self.symbolTable.symbolTable.get(variableName).value, 
-                  self.symbolTable.symbolTable.get(variableName).line, 
-                  self.symbolTable.symbolTable.get(variableName).column)
-            
+        for symbol in self.symbolTable.symbolTable.values():
+            print(f"{symbol.name} {symbol.type} {symbol.value}")
+        print("-----------------------------------------------------")
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by pjpParser#assignmentStatement.
     def visitAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
-        expression =  ctx.getChild(2).getText()
-        variableName = ctx.getChild(0).getText()
-        variableValue = ctx.getChild(2).getText()
-        
-        if ctx.getChildCount() > 4 or '+' in variableValue or '-' in variableValue or '*' in variableValue or '/' in variableValue or '%' in variableValue: 
-            variableValue = self.evaluate(variableValue)   
-        variableType = self.symbolTable.lookup(variableName).type         
-        if '.' in str(variableValue) and  variableType == Type.INT:
-            print(f"Variable {variableName} is {Type.INT} at line {ctx.start.line}, column {ctx.start.column} and cannot be assigned a FLOAT value")
+        name = ctx.getChild(0).getText()
+        symbol = self.symbolTable.lookup(name)
+        if symbol is None:
+            print(f"Symbol {name} not defined")
             sys.exit(1)
-        self.symbolTable.changeValue(variableName, variableValue)
-
-        print(self.symbolTable.symbolTable.get(variableName).name, 
-                  self.symbolTable.symbolTable.get(variableName).type, 
-                  self.symbolTable.symbolTable.get(variableName).value, 
-                  self.symbolTable.symbolTable.get(variableName).line, 
-                  self.symbolTable.symbolTable.get(variableName).column)
+        value = ctx.getChild(2).getText()
+        if symbol.type == Type.INT:
+            value = int(value)
+        elif symbol.type == Type.FLOAT:
+            value = float(value)
+        elif symbol.type == Type.BOOL:
+            if value == 'true':
+                value = True
+            elif value == 'false':
+                value = False
+        elif symbol.type == Type.STRING:
+            value = value
+        self.symbolTable.changeValue(name, value)
+        print(f"{name} {symbol.type} {value}")
+        return self.visitChildren(ctx)  
 
     # Visit a parse tree produced by pjpParser#readStatement.
     def visitReadStatement(self, ctx:pjpParser.ReadStatementContext):
-        return self.visitChildren(ctx)
+        return ctx.visitChildren(ctx)
 
 
     # Visit a parse tree produced by pjpParser#writeStatement.
     def visitWriteStatement(self, ctx:pjpParser.WriteStatementContext):
-        print(self.visit(ctx.getChild(1)))
+       
         return self.visitChildren(ctx)
 
 
@@ -139,29 +146,74 @@ class pjpImplVisitor(pjpVisitor):
 
     # Visit a parse tree produced by pjpParser#ifStatement.
     def visitIfStatement(self, ctx:pjpParser.IfStatementContext):
-        return self.visitChildren(ctx)
+        if self.visit(ctx.getChild(2)):
+            return self.visit(ctx.getChild(4))
+        elif ctx.getChildCount() == 7:
+            return self.visit(ctx.getChild(6))
+        return ''
 
 
     # Visit a parse tree produced by pjpParser#whileStatement.
     def visitWhileStatement(self, ctx:pjpParser.WhileStatementContext):
+        while self.visit(ctx.getChild(2)):
+            self.visit(ctx.getChild(4))
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by pjpParser#forStatement.
     def visitForStatement(self, ctx:pjpParser.ForStatementContext):
+        self.visit(ctx.getChild(2))
+        while self.visit(ctx.getChild(4)):
+            self.visit(ctx.getChild(8))
+            self.visit(ctx.getChild(6))
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by pjpParser#expression.
     def visitExpression(self, ctx:pjpParser.ExpressionContext):
+        #left = self.visit(ctx.getChild(0))
+        #right = self.visit(ctx.getChild(2))
+        print(f"{left} {right}")
+        if ctx.PLUS is not None:
+            return left + right
+        elif ctx.MINUS is not None:
+            return left - right
+        elif ctx.MULT is not None:
+            return left * right
+        elif ctx.DIV is not None:
+            return left / right
+        elif ctx.MOD is not None:
+            return left % right
+        elif ctx.LT is not None:
+            return left < right
+        elif ctx.LE is not None:
+            return left <= right
+        elif ctx.GT is not None:
+            return left > right
+        elif ctx.GE is not None:
+            return left >= right
+        elif ctx.EQ is not None:
+            return left == right
+        elif ctx.NE is not None:
+            return left != right
+        elif ctx.AND is not None:
+            return left and right
+        elif ctx.OR is not None:
+            return left or right
+        elif ctx.NOT is not None:
+            return not left
+
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by pjpParser#literals.
     def visitLiterals(self, ctx:pjpParser.LiteralsContext):
+        if ctx.INTEGER() is not None:
+            return int(ctx.getChild(0).getText())
+        elif ctx.FLOAT() is not None:
+            return float(ctx.getChild(0).getText())
+        elif ctx.BOOLEAN() is not None:
+            return bool(ctx.getChild(0).getText())
+        elif ctx.STRING() is not None:
+            return str(ctx.getChild(0).getText())
         return self.visitChildren(ctx)
-    
-    def evaluate(self, expression):
-        temp = str(expression).split()
-        delimiters = ['+', '-', '*', '/', '%']
-        return eval(expression)
