@@ -41,7 +41,7 @@ write "y (10.0): ", y;
 
 write "<Multiple Assignments>";
 int i,j,k;
-i=j=k=55;
+i=55;
 write "i=j=k=55: ",i,"=",j,"=",k;
 
 write "<Input - a(int),b(float),c(string),d(bool)>";

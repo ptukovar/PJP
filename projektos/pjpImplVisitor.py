@@ -47,6 +47,7 @@ class SymbolTable(ParseTreeVisitor):
 class pjpImplVisitor(pjpVisitor):
     def __init__(self):
         self.symbolTable = SymbolTable()
+        self.machineCode = []
 
     # Visit a parse tree produced by pjpParser#prog.
     def visitProg(self, ctx:pjpParser.ProgContext):
@@ -99,43 +100,99 @@ class pjpImplVisitor(pjpVisitor):
                     value = value
             self.symbolTable.insert(Symbol(ctx.getChild(i).getText(), variableType, value, ctx.start.line, ctx.start.column))
             
-        for symbol in self.symbolTable.symbolTable.values():
-            print(f"{symbol.name} {symbol.type} {symbol.value}")
-        print("-----------------------------------------------------")
+        #for symbol in self.symbolTable.symbolTable.values():
+        #    print(f"{symbol.name} {symbol.type} {symbol.value}")
+        #print("-----------------------------------------------------")
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by pjpParser#assignmentStatement.
     def visitAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
-        name = ctx.getChild(0).getText()
+        name = self.visit(ctx.getChild(0)).name
         symbol = self.symbolTable.lookup(name)
-        if symbol is None:
-            print(f"Symbol {name} not defined")
-            sys.exit(1)
-        value = ctx.getChild(2).getText()
+        if symbol is not None:
+            value = self.symbolTable.lookup(name).value
+            if self.symbolTable.lookup(name).value == None:
+                value = ctx.getChild(2).getText()
+        else:
+            value = ctx.getChild(2).getText()
         if symbol.type == Type.INT:
             value = int(value)
+            self.machineCode.append(f"push I {value}")
         elif symbol.type == Type.FLOAT:
             value = float(value)
+            self.machineCode.append(f"push F {value}")
         elif symbol.type == Type.BOOL:
             if value == 'true':
                 value = True
             elif value == 'false':
                 value = False
+            self.machineCode.append(f"push B {str(value).lower()}")
         elif symbol.type == Type.STRING:
             value = value
+            self.machineCode.append(f"push S {value}")
         self.symbolTable.changeValue(name, value)
-        print(f"{name} {symbol.type} {value}")
+        #print(f"{name} {symbol.type} {value}")
         return self.visitChildren(ctx)  
 
     # Visit a parse tree produced by pjpParser#readStatement.
     def visitReadStatement(self, ctx:pjpParser.ReadStatementContext):
-        return ctx.visitChildren(ctx)
+        for i in range(1,ctx.getChildCount()-1):
+            if ctx.getChild(i).getText() == ',':
+                continue
+            name = ctx.getChild(i).getText()
+            symbol = self.symbolTable.lookup(name)
+            value = input(f"{name} = ")
+            if symbol.type == Type.INT:
+                value = int(value)
+                print(f"read I")
+                self.machineCode.append(f"read I")
+            elif symbol.type == Type.FLOAT:
+                value = float(value)
+                print(f"read F")
+                self.machineCode.append(f"read F")
+            elif symbol.type == Type.BOOL:
+                value = bool(value)
+                print(f"read B")
+                self.machineCode.append(f"read B")
+            elif symbol.type == Type.STRING:
+                value = value
+                print(f"read S")
+                self.machineCode.append(f"read S")
+            self.symbolTable.changeValue(name, value)
+            print(f"save {name}")
+            self.machineCode.append(f"save {name}")
+        return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by pjpParser#writeStatement.
     def visitWriteStatement(self, ctx:pjpParser.WriteStatementContext):
-       
+        output = ""
+        child_count = 0
+        for child in ctx.getChildren():
+            if isinstance(child, pjpParser.ExpressionContext):
+                result = self.visit(child)
+                if isinstance(result, str) and (result.startswith('"') and result.endswith('"')):
+                    output = f'push S {result}'
+                    self.machineCode.append(output)
+                elif isinstance(result, str):
+                    output = f'load {result}'
+                    self.machineCode.append(output)
+                elif isinstance(result, int):
+                    output = f'push I {result}'
+                    self.machineCode.append(output)
+                elif isinstance(result, float):
+                    output = f'push F {result}'
+                    self.machineCode.append(output)
+                elif isinstance(result, bool):
+                    output = f'push B {str(result).lower()}'
+                    self.machineCode.append(output)
+                print(output)
+                child_count += 1
+
+        output= f'print {child_count}'
+        
+        print(output)
         return self.visitChildren(ctx)
 
 
@@ -171,37 +228,49 @@ class pjpImplVisitor(pjpVisitor):
 
     # Visit a parse tree produced by pjpParser#expression.
     def visitExpression(self, ctx:pjpParser.ExpressionContext):
-        #left = self.visit(ctx.getChild(0))
-        #right = self.visit(ctx.getChild(2))
-        print(f"{left} {right}")
-        if ctx.PLUS is not None:
-            return left + right
-        elif ctx.MINUS is not None:
-            return left - right
-        elif ctx.MULT is not None:
-            return left * right
-        elif ctx.DIV is not None:
-            return left / right
-        elif ctx.MOD is not None:
-            return left % right
-        elif ctx.LT is not None:
-            return left < right
-        elif ctx.LE is not None:
-            return left <= right
-        elif ctx.GT is not None:
-            return left > right
-        elif ctx.GE is not None:
-            return left >= right
-        elif ctx.EQ is not None:
-            return left == right
-        elif ctx.NE is not None:
-            return left != right
-        elif ctx.AND is not None:
-            return left and right
-        elif ctx.OR is not None:
-            return left or right
-        elif ctx.NOT is not None:
-            return not left
+        if ctx.getChildCount() == 3:
+            left = self.visit(ctx.getChild(0))
+            right = self.visit(ctx.getChild(2))
+            if left is None or right is None:
+                #print("Error: Unsupported operand type(s) for +: 'NoneType' and 'NoneType'")
+                return None
+            if ctx.PLUS is not None:
+                return left + right
+            elif ctx.MINUS is not None:
+                return left - right
+            elif ctx.MULT is not None:
+                return left * right
+            elif ctx.DIV is not None:
+                return left / right
+            elif ctx.MOD is not None:
+                return left % right
+            elif ctx.LT is not None:
+                return left < right
+            elif ctx.LE is not None:
+                return left <= right
+            elif ctx.GT is not None:
+                return left > right
+            elif ctx.GE is not None:
+                return left >= right
+            elif ctx.EQ is not None:
+                return left == right
+            elif ctx.NE is not None:
+                return left != right
+            elif ctx.AND is not None:
+                return left and right
+            elif ctx.OR is not None:
+                return left or right
+            elif ctx.NOT is not None:
+                return not left
+        elif ctx.getChildCount() == 1:
+            if ctx.INTEGER() is not None:
+                return int(ctx.getChild(0).getText())
+            elif ctx.FLOAT() is not None:
+                return float(ctx.getChild(0).getText())
+            elif ctx.BOOLEAN() is not None:
+                return bool(ctx.getChild(0).getText())
+            elif ctx.STRING() is not None:
+                return str(ctx.getChild(0).getText())
 
         return self.visitChildren(ctx)
 
