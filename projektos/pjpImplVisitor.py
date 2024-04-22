@@ -1,8 +1,10 @@
 from antlr4 import ParseTreeVisitor
 from pjpVisitor import pjpVisitor
 from pjpParser import pjpParser
+from virtualMachine import virtualMachine
 from enum import Enum
 import sys
+
 
 class Type(Enum):
     INT = 1
@@ -51,6 +53,7 @@ class pjpImplVisitor(pjpVisitor):
 
     # Visit a parse tree produced by pjpParser#prog.
     def visitProg(self, ctx:pjpParser.ProgContext):
+        virtualMachine(self.machineCode).run()
         return self.visitChildren(ctx)
 
 
@@ -98,11 +101,10 @@ class pjpImplVisitor(pjpVisitor):
                         value = False
                 elif variableType == Type.STRING:
                     value = value
-            self.symbolTable.insert(Symbol(ctx.getChild(i).getText(), variableType, value, ctx.start.line, ctx.start.column))
-            
-        #for symbol in self.symbolTable.symbolTable.values():
-        #    print(f"{symbol.name} {symbol.type} {symbol.value}")
-        #print("-----------------------------------------------------")
+            if (variableType == Type.INT or variableType == Type.FLOAT) and value is None:
+                self.symbolTable.insert(Symbol(ctx.getChild(i).getText(), variableType, 0, ctx.start.line, ctx.start.column)) 
+            else:
+                self.symbolTable.insert(Symbol(ctx.getChild(i).getText(), variableType, value, ctx.start.line, ctx.start.column))
         return self.visitChildren(ctx)
 
 
@@ -132,7 +134,6 @@ class pjpImplVisitor(pjpVisitor):
             value = value
             self.machineCode.append(f"push S {value}")
         self.symbolTable.changeValue(name, value)
-        #print(f"{name} {symbol.type} {value}")
         return self.visitChildren(ctx)  
 
     # Visit a parse tree produced by pjpParser#readStatement.
@@ -142,7 +143,16 @@ class pjpImplVisitor(pjpVisitor):
                 continue
             name = ctx.getChild(i).getText()
             symbol = self.symbolTable.lookup(name)
-            value = input(f"{name} = ")
+            temptype = symbol.type
+            if symbol.type == Type.INT:
+                value = int(input(f"{name} I = "))
+            elif symbol.type == Type.FLOAT:
+                value = float(input(f"{name} F = "))
+            elif symbol.type == Type.BOOL:
+                value = bool(input(f"{name} B = "))
+            elif symbol.type == Type.STRING:
+                value = input(f"{name} S = ")
+            
             if symbol.type == Type.INT:
                 value = int(value)
                 print(f"read I")
@@ -173,26 +183,26 @@ class pjpImplVisitor(pjpVisitor):
             if isinstance(child, pjpParser.ExpressionContext):
                 result = self.visit(child)
                 if isinstance(result, str) and (result.startswith('"') and result.endswith('"')):
-                    output = f'push S {result}'
+                    output = f'S {result}'
                     self.machineCode.append(output)
                 elif isinstance(result, str):
-                    output = f'load {result}'
+                    output = f'X {result}'
                     self.machineCode.append(output)
                 elif isinstance(result, int):
-                    output = f'push I {result}'
+                    output = f'I {result}'
                     self.machineCode.append(output)
                 elif isinstance(result, float):
-                    output = f'push F {result}'
+                    output = f'F {result}'
                     self.machineCode.append(output)
                 elif isinstance(result, bool):
-                    output = f'push B {str(result).lower()}'
+                    output = f'B {str(result).lower()}'
                     self.machineCode.append(output)
-                print(output)
                 child_count += 1
+                #print(output)
 
         output= f'print {child_count}'
-        
-        print(output)
+        #print(output)
+        self.machineCode.append(output)
         return self.visitChildren(ctx)
 
 
@@ -231,18 +241,63 @@ class pjpImplVisitor(pjpVisitor):
         if ctx.getChildCount() == 3:
             left = self.visit(ctx.getChild(0))
             right = self.visit(ctx.getChild(2))
+            if isinstance(left, str) and (left.startswith('"') and left.endswith('"')):
+                left_type = Type.STRING
+            elif isinstance(left, str):
+                left_type = Type.ERROR
+            elif isinstance(left, int):
+                left_type = Type.INT
+            elif isinstance(left, float):
+                left_type = Type.FLOAT
+            elif isinstance(left, bool):
+                left_type = Type.BOOL
+            else:
+                left_type = Type.ERROR
+
+            if isinstance(right, str) and (right.startswith('"') and right.endswith('"')):
+                right_type = Type.STRING
+            elif isinstance(right, str):
+                right_type = Type.ERROR
+            elif isinstance(right, int):
+                right_type = Type.INT
+            elif isinstance(right, float):
+                right_type = Type.FLOAT
+            elif isinstance(right, bool):
+                right_type = Type.BOOL
+            else:
+                right_type = Type.ERROR
             if left is None or right is None:
-                #print("Error: Unsupported operand type(s) for +: 'NoneType' and 'NoneType'")
+                #print("Error")
                 return None
             if ctx.PLUS is not None:
+                self.machineCode.append(f"push {left_type} {left}")
+                self.machineCode.append(f"push {right_type} {right}")
+                left_type = self.checkIntToFloat(left_type, right_type)
+                self.machineCode.append(f"add {left_type}")
+                self.machineCode.append(f"pop")
                 return left + right
             elif ctx.MINUS is not None:
                 return left - right
             elif ctx.MULT is not None:
+                self.machineCode.append(f"push {left_type} {left}")
+                self.machineCode.append(f"push {right_type} {right}")
+                left_type = self.checkIntToFloat(left_type, right_type)
+                self.machineCode.append(f"mul {left_type}")
+                self.machineCode.append(f"pop")
                 return left * right
             elif ctx.DIV is not None:
+                self.machineCode.append(f"push {left_type} {left}")
+                self.machineCode.append(f"push {right_type} {right}")
+                left_type = self.checkIntToFloat(left_type, right_type)
+                self.machineCode.append(f"div {left_type}")
+                self.machineCode.append(f"pop")
                 return left / right
             elif ctx.MOD is not None:
+                self.machineCode.append(f"push {left_type} {left}")
+                self.machineCode.append(f"push {right_type} {right}")
+                left_type = self.checkIntToFloat(left_type, right_type)
+                self.machineCode.append(f"mod {left_type}")
+                self.machineCode.append(f"pop")
                 return left % right
             elif ctx.LT is not None:
                 return left < right
@@ -263,12 +318,17 @@ class pjpImplVisitor(pjpVisitor):
             elif ctx.NOT is not None:
                 return not left
         elif ctx.getChildCount() == 1:
+            if self.symbolTable.lookup(ctx.getChild(0).getText()) is not None:
+                return self.symbolTable.lookup(ctx.getChild(0).getText()).value
             if ctx.INTEGER() is not None:
                 return int(ctx.getChild(0).getText())
             elif ctx.FLOAT() is not None:
                 return float(ctx.getChild(0).getText())
             elif ctx.BOOLEAN() is not None:
-                return bool(ctx.getChild(0).getText())
+                if ctx.getChild(0).getText() == 'true':
+                    return True
+                elif ctx.getChild(0).getText() == 'false':
+                    return False
             elif ctx.STRING() is not None:
                 return str(ctx.getChild(0).getText())
 
@@ -286,3 +346,13 @@ class pjpImplVisitor(pjpVisitor):
         elif ctx.STRING() is not None:
             return str(ctx.getChild(0).getText())
         return self.visitChildren(ctx)
+    #op
+    def checkIntToFloat(self,left,right):
+        if left == Type.FLOAT and right == Type.INT:
+            self.machineCode.append(f"inttofloat")
+            return left
+        elif left == Type.INT and right == Type.FLOAT:
+            self.machineCode.append(f"inttofloat")
+            return right
+        else:
+            return left
