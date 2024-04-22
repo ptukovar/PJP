@@ -112,29 +112,25 @@ class pjpImplVisitor(pjpVisitor):
     def visitAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
         name = self.visit(ctx.getChild(0)).name
         symbol = self.symbolTable.lookup(name)
-        if symbol is not None:
-            value = self.symbolTable.lookup(name).value
-            if self.symbolTable.lookup(name).value == None:
-                value = ctx.getChild(2).getText()
-        else:
-            value = ctx.getChild(2).getText()
-        if symbol.type == Type.INT:
-            value = int(value)
-            self.machineCode.append(f"push I {value}")
-        elif symbol.type == Type.FLOAT:
-            value = float(value)
-            self.machineCode.append(f"push F {value}")
-        elif symbol.type == Type.BOOL:
-            if value == 'true':
-                value = True
-            elif value == 'false':
-                value = False
-            self.machineCode.append(f"push B {str(value).lower()}")
-        elif symbol.type == Type.STRING:
-            value = value
-            self.machineCode.append(f"push S {value}")
-        self.symbolTable.changeValue(name, value)
-        return self.visitChildren(ctx)  
+        value = self.visit(ctx.getChild(2))
+        if ctx.getChildCount() == 3 or ctx.getChildCount() == 4:
+            if symbol.type == Type.INT:
+                value = int(value)
+                self.machineCode.append(f"push I {value}")
+            elif symbol.type == Type.FLOAT:
+                value = float(value)
+                self.machineCode.append(f"push F {value}")
+            elif symbol.type == Type.BOOL:
+                if value == 'true':
+                    value = True
+                elif value == 'false':
+                    value = False
+                self.machineCode.append(f"push B {str(value).lower()}")
+            elif symbol.type == Type.STRING:
+                value = value
+                self.machineCode.append(f"push S {value}")
+            self.symbolTable.changeValue(name, value)
+        return self.visitChildren(ctx)
 
     # Visit a parse tree produced by pjpParser#readStatement.
     def visitReadStatement(self, ctx:pjpParser.ReadStatementContext):
@@ -269,53 +265,53 @@ class pjpImplVisitor(pjpVisitor):
             if left is None or right is None:
                 #print("Error")
                 return None
-            if ctx.PLUS is not None:
+            if "+" in ctx.getText() is not None:
                 self.machineCode.append(f"push {left_type} {left}")
                 self.machineCode.append(f"push {right_type} {right}")
                 left_type = self.checkIntToFloat(left_type, right_type)
                 self.machineCode.append(f"add {left_type}")
                 self.machineCode.append(f"pop")
                 return left + right
-            elif ctx.MINUS is not None:
+            elif "-" in ctx.getText() is not None:
                 return left - right
-            elif ctx.MULT is not None:
+            elif "*" in ctx.getText() is not None:
                 self.machineCode.append(f"push {left_type} {left}")
                 self.machineCode.append(f"push {right_type} {right}")
                 left_type = self.checkIntToFloat(left_type, right_type)
                 self.machineCode.append(f"mul {left_type}")
                 self.machineCode.append(f"pop")
                 return left * right
-            elif ctx.DIV is not None:
+            elif "/" in ctx.getText() is not None:
                 self.machineCode.append(f"push {left_type} {left}")
                 self.machineCode.append(f"push {right_type} {right}")
                 left_type = self.checkIntToFloat(left_type, right_type)
                 self.machineCode.append(f"div {left_type}")
                 self.machineCode.append(f"pop")
                 return left / right
-            elif ctx.MOD is not None:
+            elif "%" in ctx.getText() is not None:
                 self.machineCode.append(f"push {left_type} {left}")
                 self.machineCode.append(f"push {right_type} {right}")
                 left_type = self.checkIntToFloat(left_type, right_type)
                 self.machineCode.append(f"mod {left_type}")
                 self.machineCode.append(f"pop")
                 return left % right
-            elif ctx.LT is not None:
+            elif "<" in ctx.getText() is not None:
                 return left < right
-            elif ctx.LE is not None:
+            elif "<=" in ctx.getText() is not None:
                 return left <= right
-            elif ctx.GT is not None:
+            elif ">" in ctx.getText() is not None:
                 return left > right
-            elif ctx.GE is not None:
+            elif ">=" in ctx.getText() is not None:
                 return left >= right
-            elif ctx.EQ is not None:
+            elif "==" in ctx.getText() is not None:
                 return left == right
-            elif ctx.NE is not None:
+            elif "!=" in ctx.getText() is not None:
                 return left != right
-            elif ctx.AND is not None:
+            elif "&&" in ctx.getText() is not None:
                 return left and right
-            elif ctx.OR is not None:
+            elif "||" in ctx.getText() is not None:
                 return left or right
-            elif ctx.NOT is not None:
+            elif "!" in ctx.getText() is not None:
                 return not left
         elif ctx.getChildCount() == 1:
             if self.symbolTable.lookup(ctx.getChild(0).getText()) is not None:
