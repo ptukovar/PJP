@@ -1,5 +1,4 @@
-if (3<4) write "condition was true";
-else write "condition was false";
+if (3<4) write "condition was true"; else write "condition was false";
 
 if (true) {
 	write "inside";
@@ -7,7 +6,8 @@ if (true) {
 	write "if";
 }
 
-int a,b;
+int a=0;
+int b=0;
 
 while(a<10) {
  write "a=",a;

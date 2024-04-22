@@ -50,6 +50,11 @@ class pjpImplVisitor(pjpVisitor):
     def __init__(self):
         self.symbolTable = SymbolTable()
         self.machineCode = []
+        self.labelCounter = -1
+
+    def next_label(self):
+        self.labelCounter += 1
+        return self.labelCounter
 
     # Visit a parse tree produced by pjpParser#prog.
     def visitProg(self, ctx:pjpParser.ProgContext):
@@ -103,8 +108,10 @@ class pjpImplVisitor(pjpVisitor):
                     value = value
             if (variableType == Type.INT or variableType == Type.FLOAT) and value is None:
                 self.symbolTable.insert(Symbol(ctx.getChild(i).getText(), variableType, 0, ctx.start.line, ctx.start.column)) 
+                self.machineCode.append(f"save {ctx.getChild(i).getText()}")        
             else:
                 self.symbolTable.insert(Symbol(ctx.getChild(i).getText(), variableType, value, ctx.start.line, ctx.start.column))
+                self.machineCode.append(f"save {ctx.getChild(i).getText()}")        
         return self.visitChildren(ctx)
 
 
@@ -116,19 +123,21 @@ class pjpImplVisitor(pjpVisitor):
         if ctx.getChildCount() == 3 or ctx.getChildCount() == 4:
             if symbol.type == Type.INT:
                 value = int(value)
-                self.machineCode.append(f"push I {value}")
+                #self.machineCode.append(f"push I {value}")
             elif symbol.type == Type.FLOAT:
                 value = float(value)
-                self.machineCode.append(f"push F {value}")
+                #self.machineCode.append(f"push F {value}")
             elif symbol.type == Type.BOOL:
                 if value == 'true':
                     value = True
                 elif value == 'false':
                     value = False
-                self.machineCode.append(f"push B {str(value).lower()}")
+                #self.machineCode.append(f"push B {str(value).lower()}")
             elif symbol.type == Type.STRING:
                 value = value
-                self.machineCode.append(f"push S {value}")
+                #self.machineCode.append(f"push S {value}")
+            #self.machineCode.append(f"push {symbol.type.name[0]} {value}")
+            self.machineCode.append(f"save {name}")
             self.symbolTable.changeValue(name, value)
         return self.visitChildren(ctx)
 
@@ -151,22 +160,17 @@ class pjpImplVisitor(pjpVisitor):
             
             if symbol.type == Type.INT:
                 value = int(value)
-                print(f"read I")
                 self.machineCode.append(f"read I")
             elif symbol.type == Type.FLOAT:
                 value = float(value)
-                print(f"read F")
                 self.machineCode.append(f"read F")
             elif symbol.type == Type.BOOL:
                 value = bool(value)
-                print(f"read B")
                 self.machineCode.append(f"read B")
             elif symbol.type == Type.STRING:
                 value = value
-                print(f"read S")
                 self.machineCode.append(f"read S")
             self.symbolTable.changeValue(name, value)
-            print(f"save {name}")
             self.machineCode.append(f"save {name}")
         return self.visitChildren(ctx)
 
@@ -178,28 +182,28 @@ class pjpImplVisitor(pjpVisitor):
         for child in ctx.getChildren():
             if isinstance(child, pjpParser.ExpressionContext):
                 result = self.visit(child)
-                if isinstance(result, str) and (result.startswith('"') and result.endswith('"')):
-                    output = f'S {result}'
-                    self.machineCode.append(output)
-                elif isinstance(result, str):
-                    output = f'X {result}'
-                    self.machineCode.append(output)
-                elif isinstance(result, int):
-                    output = f'I {result}'
-                    self.machineCode.append(output)
-                elif isinstance(result, float):
-                    output = f'F {result}'
-                    self.machineCode.append(output)
-                elif isinstance(result, bool):
-                    output = f'B {str(result).lower()}'
-                    self.machineCode.append(output)
+                #if isinstance(result, str) and (result.startswith('"') and result.endswith('"')):
+                    #output = f'S {result}'
+                    #self.machineCode.append(output)
+                #elif isinstance(result, str):
+                    #output = f'X {result}'
+                    #self.machineCode.append(output)
+                #elif isinstance(result, int):
+                    #output = f'I {result}'
+                    #self.machineCode.append(output)
+                #elif isinstance(result, float):
+                    #output = f'F {result}'
+                    #self.machineCode.append(output)
+                #elif isinstance(result, bool):
+                    #output = f'B {str(result).lower()}'
+                    #self.machineCode.append(output)
                 child_count += 1
-                #print(output)
-
-        output= f'print {child_count}'
+        
+        self.machineCode.append(f"print {child_count}")
+        #output= f'print {child_count}'
         #print(output)
-        self.machineCode.append(output)
-        return self.visitChildren(ctx)
+        #self.machineCode.append(output)
+        return self.visitChildren(ctx) if ctx.getChildCount() == 1 else 0;
 
 
     # Visit a parse tree produced by pjpParser#block.
@@ -209,6 +213,17 @@ class pjpImplVisitor(pjpVisitor):
 
     # Visit a parse tree produced by pjpParser#ifStatement.
     def visitIfStatement(self, ctx:pjpParser.IfStatementContext):
+        condition = self.visit(ctx.getChild(2))
+        false_label = self.next_label()
+        end_label = self.next_label()
+        self.machineCode.append(f"fjmp {false_label}")
+        self.visit(ctx.getChild(4))
+        self.machineCode.append(f"jmp {end_label}")
+        self.machineCode.append(f"label {false_label}")
+        if ctx.getChildCount() == 7:
+            self.visit(ctx.getChild(6))
+        self.machineCode.append(f"label {end_label}")
+        return None
         if self.visit(ctx.getChild(2)):
             return self.visit(ctx.getChild(4))
         elif ctx.getChildCount() == 7:
@@ -218,6 +233,17 @@ class pjpImplVisitor(pjpVisitor):
 
     # Visit a parse tree produced by pjpParser#whileStatement.
     def visitWhileStatement(self, ctx:pjpParser.WhileStatementContext):
+        start_label = self.next_label()
+        end_label = self.next_label()
+        
+        self.machineCode.append(f"label {start_label}")
+        self.visit(ctx.getChild(2))
+        self.machineCode.append(f"fjmp {end_label}")
+        self.visit(ctx.getChild(4))
+        self.machineCode.append(f"jmp {start_label}")
+        self.machineCode.append(f"label {end_label}")
+
+        return None
         while self.visit(ctx.getChild(2)):
             self.visit(ctx.getChild(4))
         return self.visitChildren(ctx)
@@ -265,26 +291,27 @@ class pjpImplVisitor(pjpVisitor):
             if left is None or right is None:
                 #print("Error")
                 return None
+            
             if "+" in ctx.getText() is not None:
                 left_type = self.checkIntToFloat(left_type, right_type)
-                self.machineCode.append(f"add {left_type.name}")
+                self.machineCode.append(f"add")
                 self.machineCode.append(f"pop")
                 return left + right
             elif "-" in ctx.getText() is not None:
                 return left - right
             elif "*" in ctx.getText() is not None:
                 left_type = self.checkIntToFloat(left_type, right_type)
-                self.machineCode.append(f"mul {left_type.name}")
+                self.machineCode.append(f"mul")
                 self.machineCode.append(f"pop")
                 return left * right
             elif "/" in ctx.getText() is not None:
                 left_type = self.checkIntToFloat(left_type, right_type)
-                self.machineCode.append(f"div {left_type.name}")
+                self.machineCode.append(f"div")
                 self.machineCode.append(f"pop")
                 return left / right
             elif "%" in ctx.getText() is not None:
                 left_type = self.checkIntToFloat(left_type, right_type)
-                self.machineCode.append(f"mod {left_type.name}")
+                self.machineCode.append(f"mod")
                 self.machineCode.append(f"pop")
                 return left % right
             elif "<" in ctx.getText() is not None:
@@ -316,6 +343,7 @@ class pjpImplVisitor(pjpVisitor):
                 return not left
         elif ctx.getChildCount() == 1:
             if self.symbolTable.lookup(ctx.getChild(0).getText()) is not None:
+                self.machineCode.append(f"load {ctx.getChild(0).getText()}")
                 return self.symbolTable.lookup(ctx.getChild(0).getText()).value
             if ctx.INTEGER() is not None:
                 self.machineCode.append(f"push I {int(ctx.getChild(0).getText())}")
