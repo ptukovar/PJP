@@ -3,7 +3,10 @@ class virtualMachine:
         self.code = code
     
     def run(self):
+        file = open("output.txt","w")
         for x in self.code:
-            print(f"x: {x}")
+            file.write(f"{x}\n")
+        for x in self.code:
+            print(f"{x}")
 
         pass

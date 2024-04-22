@@ -1,0 +1,76 @@
+push I 3
+push I 4
+lt
+fjmp 1
+push S "condition was true"
+S "condition was true"
+print 1
+push S "condition was true"
+jmp 2
+label 1
+push S "condition was false"
+S "condition was false"
+print 1
+push S "condition was false"
+label 2
+push B true
+fjmp 3
+push S "inside"
+S "inside"
+print 1
+push S "inside"
+push S "second"
+S "second"
+print 1
+push S "second"
+push S "if"
+S "if"
+print 1
+push S "if"
+jmp 4
+label 3
+label 4
+label 5
+push I 10
+lt
+fjmp 6
+push S "a="
+S "a="
+I 0
+print 2
+push S "a="
+push I 1
+add INT
+pop
+push I 1
+push I 1
+add INT
+pop
+jmp 5
+label 6
+push I 0
+push I 0
+push I 0
+read I
+save b
+label 7
+lt
+fjmp 8
+push S "a="
+S "a="
+I 0
+push S ", b="
+S ", b="
+I 5
+print 4
+push S "a="
+push S ", b="
+push I 1
+add INT
+pop
+push I 1
+push I 1
+add INT
+pop
+jmp 7
+label 8

@@ -53,7 +53,7 @@ class pjpImplVisitor(pjpVisitor):
 
     # Visit a parse tree produced by pjpParser#prog.
     def visitProg(self, ctx:pjpParser.ProgContext):
-        virtualMachine(self.machineCode).run()
+        #virtualMachine(self.machineCode).run()
         return self.visitChildren(ctx)
 
 
@@ -266,68 +266,73 @@ class pjpImplVisitor(pjpVisitor):
                 #print("Error")
                 return None
             if "+" in ctx.getText() is not None:
-                self.machineCode.append(f"push {left_type} {left}")
-                self.machineCode.append(f"push {right_type} {right}")
                 left_type = self.checkIntToFloat(left_type, right_type)
-                self.machineCode.append(f"add {left_type}")
+                self.machineCode.append(f"add {left_type.name}")
                 self.machineCode.append(f"pop")
                 return left + right
             elif "-" in ctx.getText() is not None:
                 return left - right
             elif "*" in ctx.getText() is not None:
-                self.machineCode.append(f"push {left_type} {left}")
-                self.machineCode.append(f"push {right_type} {right}")
                 left_type = self.checkIntToFloat(left_type, right_type)
-                self.machineCode.append(f"mul {left_type}")
+                self.machineCode.append(f"mul {left_type.name}")
                 self.machineCode.append(f"pop")
                 return left * right
             elif "/" in ctx.getText() is not None:
-                self.machineCode.append(f"push {left_type} {left}")
-                self.machineCode.append(f"push {right_type} {right}")
                 left_type = self.checkIntToFloat(left_type, right_type)
-                self.machineCode.append(f"div {left_type}")
+                self.machineCode.append(f"div {left_type.name}")
                 self.machineCode.append(f"pop")
                 return left / right
             elif "%" in ctx.getText() is not None:
-                self.machineCode.append(f"push {left_type} {left}")
-                self.machineCode.append(f"push {right_type} {right}")
                 left_type = self.checkIntToFloat(left_type, right_type)
-                self.machineCode.append(f"mod {left_type}")
+                self.machineCode.append(f"mod {left_type.name}")
                 self.machineCode.append(f"pop")
                 return left % right
             elif "<" in ctx.getText() is not None:
+                self.machineCode.append(f"lt")
                 return left < right
             elif "<=" in ctx.getText() is not None:
+                self.machineCode.append(f"le")
                 return left <= right
             elif ">" in ctx.getText() is not None:
+                self.machineCode.append(f"gt")
                 return left > right
             elif ">=" in ctx.getText() is not None:
+                self.machineCode.append(f"ge")
                 return left >= right
             elif "==" in ctx.getText() is not None:
+                self.machineCode.append(f"eq")
                 return left == right
             elif "!=" in ctx.getText() is not None:
+                self.machineCode.append(f"ne")
                 return left != right
             elif "&&" in ctx.getText() is not None:
+                self.machineCode.append(f"and")
                 return left and right
             elif "||" in ctx.getText() is not None:
+                self.machineCode.append(f"or")
                 return left or right
             elif "!" in ctx.getText() is not None:
+                self.machineCode.append(f"not")
                 return not left
         elif ctx.getChildCount() == 1:
             if self.symbolTable.lookup(ctx.getChild(0).getText()) is not None:
                 return self.symbolTable.lookup(ctx.getChild(0).getText()).value
             if ctx.INTEGER() is not None:
+                self.machineCode.append(f"push I {int(ctx.getChild(0).getText())}")
                 return int(ctx.getChild(0).getText())
             elif ctx.FLOAT() is not None:
+                self.machineCode.append(f"push F {float(ctx.getChild(0).getText())}")
                 return float(ctx.getChild(0).getText())
             elif ctx.BOOLEAN() is not None:
                 if ctx.getChild(0).getText() == 'true':
+                    self.machineCode.append(f"push B true")
                     return True
                 elif ctx.getChild(0).getText() == 'false':
+                    self.machineCode.append(f"push B false")
                     return False
             elif ctx.STRING() is not None:
+                self.machineCode.append(f"push S {str(ctx.getChild(0).getText())}")
                 return str(ctx.getChild(0).getText())
-
         return self.visitChildren(ctx)
 
 
