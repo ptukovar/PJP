@@ -4,6 +4,10 @@ class virtualMachine:
         self.stack = []
         self.variables = {}
 
+    def debug_state(self, message=""):
+        print(f"{message}\nCurrent Stack: {self.stack}")
+        print(f"Current Variables: {self.variables}\n")
+
     def run(self):
         operations = {
             'PUSH': self.push,
@@ -16,7 +20,7 @@ class virtualMachine:
             'MOD': self.mod,
             'PRINT': self.print,
         }
-    
+
         for line in self.code:
             parts = line.strip().split()
             if not parts:
@@ -24,7 +28,14 @@ class virtualMachine:
             instr = parts[0].upper()
             args = parts[1:]
             if instr in operations:
+                #self.debug_state(f"Before {instr} {args}")
                 operations[instr](*args)
+                #self.debug_state(f"After {instr} {args}")
+        
+        file = open("XXX.txt", "a")
+        for stack in self.stack:
+            file.write(str(stack) + "\n")
+            print(stack)
 
     def push(self, type, value):
         self.stack.append(float(value) if type == 'f' else int(value))
@@ -79,7 +90,5 @@ class virtualMachine:
         if not self.stack:
             raise Exception("Attempt to print but stack is empty")
         value = self.stack[-1]
-        file = open("XXX.txt", "a")
-        file.write(f"{value}\n")
-        print(f"Output ({type}): {value}")
+        #print(f"Output ({type}): {value}")
 
