@@ -4,6 +4,7 @@ from pjpLexer import pjpLexer
 from pjpParser import pjpParser
 from pjpVisitor import pjpVisitor
 from pjpImplVisitor import pjpImplVisitor
+from virtualMachine import virtualMachine
 
 #na priste: unifikace int na float
 #visitor je obecnejsi
@@ -19,6 +20,8 @@ from pjpImplVisitor import pjpImplVisitor
 
 #vylepsit gramatiku
 
+
+
 def pjp(argv):
     input_stream = FileStream(argv[1])
     lexer = pjpLexer(input_stream)
@@ -31,6 +34,7 @@ def pjp(argv):
     else:
         vinterp = pjpImplVisitor()
         vinterp.visit(tree)
+        virtualMachine(vinterp.machineCode).run()
 
 if __name__ == '__main__':
     pjp(sys.argv)
