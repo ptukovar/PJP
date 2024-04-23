@@ -2,97 +2,76 @@ grammar pjp;
 
 prog: (statement)+ EOF;
 
-variables: VARIABLE;
+type: 'int' | 'float' | 'string' | 'bool';              
 
-statement: SEMICOLON
-    | assignmentTypeStatement
-    | expression SEMICOLON
-    | readStatement
-    | writeStatement
-    | block
-    | ifStatement
-    | whileStatement
-    | forStatement
-    | assignmentStatement
-    ;
+variables: VARIABLE                                                                         #var
+        ;
 
-assignmentTypeStatement: TYPE variables (ASSIGN expression)? (COMMA variables (ASSIGN expression)?)* SEMICOLON | TYPE variables ASSIGN (PLUS | MINUS | TIMES | DIVIDE | MOD) expression SEMICOLON;
-assignmentStatement: variables (ASSIGN variables)* ASSIGN expression SEMICOLON | variables ASSIGN (PLUS | MINUS | TIMES | DIVIDE | MOD) expression SEMICOLON;
-readStatement: READ variables (COMMA variables)* SEMICOLON;
-writeStatement: WRITE expression (COMMA expression)* SEMICOLON;
-block: LBRACE statement* RBRACE;
-ifStatement: IF LPAREN expression RPAREN statement (ELSE statement)?;
-whileStatement: WHILE LPAREN expression RPAREN statement;
-forStatement: FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN statement;
+literals: INTEGER                                                                           #int
+        | FLOAT                                                                             #float
+        | STRING                                                                            #string
+        | BOOLEAN                                                                           #bool
+        ;
 
-expression: MINUS expression
-    | ((TYPE)+ expression ASSIGN)+ expression expression | expression '?' expression ':' expression
-    | STRING DOT STRING
-    | INTEGER
-    | FLOAT
-    | STRING
-    | BOOLEAN
-    | variables
-    | LPAREN expression RPAREN
-    | expression PLUS expression
-    | expression MINUS expression
-    | expression TIMES expression
-    | expression DIVIDE expression
-    | expression MOD expression
-    | expression EQ expression
-    | expression NEQ expression
-    | expression LT expression
-    | expression LEQ expression
-    | expression GT expression
-    | expression GEQ expression
-    | expression AND expression
-    | expression OR expression 
-    | NOT expression
-    ;
+statement: SEMICOLON                                                                        #empty
+        | type variables (COMMA variables)* SEMICOLON                                       #declaration                             
+        | expression SEMICOLON                                                              #expr                              
+        | READ variables (COMMA variables)* SEMICOLON                                       #read      
+        | WRITE expression (COMMA expression)* SEMICOLON                                    #write  
+        | LBRACE statement* RBRACE                                                          #block                                        
+        | IF LPAREN expression RPAREN statement (ELSE statement)?                           #if                     
+        | WHILE LPAREN expression RPAREN statement                                          #while                               
+        | FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN statement  #for                                    
+        ;
 
-literals: INTEGER | FLOAT | STRING | BOOLEAN;
-DOT: '.';
-PLUS: '+';
-MINUS: '-';
-TIMES: '*';
-DIVIDE: '/';
-MOD: '%';
+expression: literals                                                                        #literal
+        | variables                                                                         #variable
+        | expression AND expression                                                         #and
+        | expression OR expression                                                          #or
+        | expression op=(EQ | NEQ ) expression                                              #eqneq
+        | expression op=(LT | GT) expression                                                #ltgt
+        | expression op=(TIMES | DIVIDE | MOD) expression                                   #muldivmod
+        | expression op=(PLUS | MINUS) expression                                           #addsub
+        | variables EQ expression                                                           #assign
+        | NOT expression                                                                    #not
+        | LPAREN expression RPAREN                                                          #paren
+        | MINUS expression                                                                  #minus
+        | expression QUESTION expression DOUBLEDOT expression                               #ternary
+        ;
 
-AND: '&&';
-OR: '||';
-EQ: '==';
+
+EQ: '=';
 NEQ: '!=';
 LT: '<';
-LEQ: '<=';
 GT: '>';
-GEQ: '>=';
+MOD: '%';
+TIMES: '*';
+DIVIDE: '/';
+PLUS: '+';
+MINUS: '-';
+QUESTION: '?';
+DOUBLEDOT: ':';
+AND: '&&';
+OR: '||';
 NOT: '!';
 
-LPAREN: '(';
-RPAREN: ')';
-LBRACE: '{';
-RBRACE: '}';
-ASSIGN: '=';
-
+SEMICOLON: ';';
+COMMA: ',';
+READ: 'read';
+WRITE: 'write';
 IF: 'if';
 ELSE: 'else';
 WHILE: 'while';
 FOR: 'for';
-READ: 'read';
-WRITE: 'write';
-INCREMENT: '++';
-DECREMENT: '--';
-SEMICOLON: ';';
-COMMA: ',';
-TYPE: 'int' | 'float' | 'string' | 'bool';
+LBRACE: '{';
+RBRACE: '}';
+LPAREN: '(';
+RPAREN: ')';
 
+VARIABLE: [a-zA-Z] [a-zA-Z0-9]*;
 INTEGER: [0-9]+;
-FLOAT: [0-9]+'.'[0-9]+;
+FLOAT: [0-9]+ '.' [0-9]+;
 STRING: '"' ~'"'* '"';
 BOOLEAN: 'true' | 'false';
-
-WHITESPACE: [ \t\r\n]+ -> skip;
+WS: [ \t\n\r]+ -> skip;
 COMMENT: '//' ~[\r\n]* -> skip;
-COMMENT_LINE: '/*' .*? '*/' -> skip;
-
-VARIABLE: [a-zA-Z_]+;

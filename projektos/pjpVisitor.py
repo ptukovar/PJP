@@ -14,33 +14,58 @@ class pjpVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#variables.
-    def visitVariables(self, ctx:pjpParser.VariablesContext):
+    # Visit a parse tree produced by pjpParser#type.
+    def visitType(self, ctx:pjpParser.TypeContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#statement.
-    def visitStatement(self, ctx:pjpParser.StatementContext):
+    # Visit a parse tree produced by pjpParser#var.
+    def visitVar(self, ctx:pjpParser.VarContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#assignmentTypeStatement.
-    def visitAssignmentTypeStatement(self, ctx:pjpParser.AssignmentTypeStatementContext):
+    # Visit a parse tree produced by pjpParser#int.
+    def visitInt(self, ctx:pjpParser.IntContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#assignmentStatement.
-    def visitAssignmentStatement(self, ctx:pjpParser.AssignmentStatementContext):
+    # Visit a parse tree produced by pjpParser#float.
+    def visitFloat(self, ctx:pjpParser.FloatContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#readStatement.
-    def visitReadStatement(self, ctx:pjpParser.ReadStatementContext):
+    # Visit a parse tree produced by pjpParser#string.
+    def visitString(self, ctx:pjpParser.StringContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#writeStatement.
-    def visitWriteStatement(self, ctx:pjpParser.WriteStatementContext):
+    # Visit a parse tree produced by pjpParser#bool.
+    def visitBool(self, ctx:pjpParser.BoolContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#empty.
+    def visitEmpty(self, ctx:pjpParser.EmptyContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#declaration.
+    def visitDeclaration(self, ctx:pjpParser.DeclarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#expr.
+    def visitExpr(self, ctx:pjpParser.ExprContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#read.
+    def visitRead(self, ctx:pjpParser.ReadContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#write.
+    def visitWrite(self, ctx:pjpParser.WriteContext):
         return self.visitChildren(ctx)
 
 
@@ -49,28 +74,83 @@ class pjpVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#ifStatement.
-    def visitIfStatement(self, ctx:pjpParser.IfStatementContext):
+    # Visit a parse tree produced by pjpParser#if.
+    def visitIf(self, ctx:pjpParser.IfContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#whileStatement.
-    def visitWhileStatement(self, ctx:pjpParser.WhileStatementContext):
+    # Visit a parse tree produced by pjpParser#while.
+    def visitWhile(self, ctx:pjpParser.WhileContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#forStatement.
-    def visitForStatement(self, ctx:pjpParser.ForStatementContext):
+    # Visit a parse tree produced by pjpParser#for.
+    def visitFor(self, ctx:pjpParser.ForContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#expression.
-    def visitExpression(self, ctx:pjpParser.ExpressionContext):
+    # Visit a parse tree produced by pjpParser#minus.
+    def visitMinus(self, ctx:pjpParser.MinusContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by pjpParser#literals.
-    def visitLiterals(self, ctx:pjpParser.LiteralsContext):
+    # Visit a parse tree produced by pjpParser#or.
+    def visitOr(self, ctx:pjpParser.OrContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#muldivmod.
+    def visitMuldivmod(self, ctx:pjpParser.MuldivmodContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#ltgt.
+    def visitLtgt(self, ctx:pjpParser.LtgtContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#addsub.
+    def visitAddsub(self, ctx:pjpParser.AddsubContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#eqneq.
+    def visitEqneq(self, ctx:pjpParser.EqneqContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#literal.
+    def visitLiteral(self, ctx:pjpParser.LiteralContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#not.
+    def visitNot(self, ctx:pjpParser.NotContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#paren.
+    def visitParen(self, ctx:pjpParser.ParenContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#and.
+    def visitAnd(self, ctx:pjpParser.AndContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#variable.
+    def visitVariable(self, ctx:pjpParser.VariableContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#ternary.
+    def visitTernary(self, ctx:pjpParser.TernaryContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by pjpParser#assign.
+    def visitAssign(self, ctx:pjpParser.AssignContext):
         return self.visitChildren(ctx)
 
 
