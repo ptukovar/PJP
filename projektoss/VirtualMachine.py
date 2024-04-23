@@ -7,12 +7,12 @@ class VirtualMachine:
     
     
     code = []
-    variables = {} # name,type,value
+    variables = {}
     stack = []
 
     def splitter(self,lst):
         for i in lst: 
-            if 'push' in i: # push T x
+            if 'push' in i:
                 if i[5] == 'I':
                     self.code.append(['push',i[5],int(i[7:])])
                 elif i[5] == 'F':
@@ -28,49 +28,49 @@ class VirtualMachine:
                 else:
                     self.code.append(['push','S',str(i[7:])])
                 
-            elif 'load' in i: # load id
+            elif 'load' in i:
                 self.code.append(['load',i[5:]])
-            elif 'save' in i: # save id
+            elif 'save' in i:
                 self.code.append(['save',i[5:]])
-            elif 'label' in i: # label n
+            elif 'label' in i:
                 self.code.append(['label',int(i[6:])])
-            elif 'fjmp' in i: # fjpm n
+            elif 'fjmp' in i: 
                 self.code.append(['fjmp',int(i[5:])])
-            elif 'jmp' in i: # jmp n
+            elif 'jmp' in i:
                 self.code.append(['jmp',int(i[4:])])
-            elif 'print' in i: # print n
+            elif 'print' in i:
                 self.code.append(['print',int(i[6:])])
-            elif 'read' in i: # read T
+            elif 'read' in i:
                 self.code.append(['read',i[5:]])
-            elif 'gt' in i: # gt
+            elif 'gt' in i:
                 self.code.append(['gt'])
-            elif 'lt' in i: # lt
+            elif 'lt' in i:
                 self.code.append(['lt'])
-            elif 'eq' in i: # eq
+            elif 'eq' in i:
                 self.code.append(['eq'])
-            elif 'not' in i: # not
+            elif 'not' in i:
                 self.code.append(['not'])
-            elif 'and' in i: # and
+            elif 'and' in i:
                 self.code.append(['and'])
-            elif 'or' in i: # or
+            elif 'or' in i:
                 self.code.append(['or'])
-            elif 'add' in i: # add
+            elif 'add' in i:
                 self.code.append(['add'])
-            elif 'sub' in i: # sub
+            elif 'sub' in i:
                 self.code.append(['sub'])
-            elif 'mul' in i: # mul
+            elif 'mul' in i:
                 self.code.append(['mul'])
-            elif 'div' in i: # div
+            elif 'div' in i:
                 self.code.append(['div'])
-            elif 'mod' in i: # mod
+            elif 'mod' in i:
                 self.code.append(['mod'])
-            elif 'uminus' in i: # uminus
+            elif 'uminus' in i:
                 self.code.append(['uminus'])
-            elif 'concat' in i: # concat
+            elif 'concat' in i:
                 self.code.append(['concat'])
-            elif 'pop' in i: # pop
+            elif 'pop' in i:
                 self.code.append(['pop'])
-            elif 'itof' in i: # itof
+            elif 'itof' in i:
                 self.code.append(['itof'])
             else:
                 print("Error: Invalid instruction")
@@ -146,16 +146,16 @@ class VirtualMachine:
             self.stack.append(self.stack.pop() + self.stack.pop())
         elif instr[0] == 'read':
             if instr[1] == 'I':
-                self.stack.append(int(input()))
+                self.stack.append(int(input("Enter integer:")))
             elif instr[1] == 'F':
-                self.stack.append(float(input()))
+                self.stack.append(float(input("Enter float:")))
             elif instr[1] == 'B':
-                if input() == 'true':
+                if input("Enter bool:") == 'true':
                     self.stack.append(True)
                 else:
                     self.stack.append(False)
             elif instr[1] == 'S':
-                self.stack.append(input())
+                self.stack.append(input("Enter string:"))
 
         elif instr[0] == 'pop':
             self.stack.pop()
