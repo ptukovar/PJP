@@ -1,71 +1,85 @@
 class virtualMachine:
-    def __init__(self,code):
+    def __init__(self, code):
         self.code = code
         self.stack = []
         self.variables = {}
-    
+
     def run(self):
-        file = open("output.txt","w")
-        for x in self.code:
-            file.write(f"{x}\n")
-
-        try:
-            self.code = open("test.txt","r").readlines()
-        except FileNotFoundError:
-            print("Soubor 'test.txt' nebyl nalezen.")
-
         operations = {
             'PUSH': self.push,
             'SAVE': self.save,
             'LOAD': self.load,
             'ADD': self.add,
+            'SUB': self.sub,
+            'MUL': self.mul,
+            'DIV': self.div,
             'MOD': self.mod,
             'PRINT': self.print,
         }
-        
+    
         for line in self.code:
             parts = line.strip().split()
             if not parts:
                 continue
-            instr = parts[0]
+            instr = parts[0].upper()
             args = parts[1:]
             if instr in operations:
                 operations[instr](*args)
-        
-        with open("XXX.txt", "w") as file:
-            while self.stack:
-                value = self.stack.pop(0)  
-                file.write(f"{value}\n")
 
     def push(self, type, value):
-        if type == 'I':
-            self.stack.append(int(value))
-        elif type == 'F':
-            self.stack.append(float(value))
-    
-    def save(self, var_name):
+        self.stack.append(float(value) if type == 'f' else int(value))
+
+    def save(self, type, var_name):
+        if not self.stack:
+            raise Exception("Attempt to save but stack is empty")
         value = self.stack.pop()
         self.variables[var_name] = value
-    
+
     def load(self, var_name):
-        value = self.variables.get(var_name, 0)
-        self.stack.append(value)
-    
+        if var_name not in self.variables:
+            raise Exception(f"Variable {var_name} not defined")
+        self.stack.append(self.variables[var_name])
+
     def add(self):
+        if len(self.stack) < 2:
+            raise Exception("Not enough elements on the stack to perform add")
         b = self.stack.pop()
         a = self.stack.pop()
         self.stack.append(a + b)
+
+    def sub(self):
+        if len(self.stack) < 2:
+            raise Exception("Not enough elements on the stack to perform sub")
+        b = self.stack.pop()
+        a = self.stack.pop()
+        self.stack.append(a - b)
+
+    def mul(self):
+        if len(self.stack) < 2:
+            raise Exception("Not enough elements on the stack to perform mul")
+        b = self.stack.pop()
+        a = self.stack.pop()
+        self.stack.append(a * b)
     
+    def div(self):
+        if len(self.stack) < 2:
+            raise Exception("Not enough elements on the stack to perform div")
+        b = self.stack.pop()
+        a = self.stack.pop()
+        self.stack.append(a / b)
+
     def mod(self):
+        if len(self.stack) < 2:
+            raise Exception("Not enough elements on the stack to perform mod")
         b = self.stack.pop()
         a = self.stack.pop()
         self.stack.append(a % b)
-    
-    def print(self, type=None):
-        value = self.stack.pop()
-        if type == 'I':
-            value = int(value)
-        elif type == 'F':
-            value = float(value)
-        print(value)
-        self.stack.append(value) 
+
+    def print(self, type):
+        if not self.stack:
+            raise Exception("Attempt to print but stack is empty")
+        value = self.stack[-1]
+        file = open("XXX.txt", "a")
+        file.write(f"{value}\n")
+        print(f"Output ({type}): {value}")
+

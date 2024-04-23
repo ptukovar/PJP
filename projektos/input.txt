@@ -1,24 +1,11 @@
-if (3<4) write "condition was true"; else write "condition was false";
-
-if (true) {
-	write "inside";
-	write "second";
-	write "if";
-}
-
-int a=0;
-int b=0;
-
-while(a<10) {
- write "a=",a;
- a=a+1;
-}
-
-a=0;
-
-read b;
-
-while(a<b) {
- write "a=",a,", b=",b;
- a=a+1;
-}
+int a,b;
+a = 15;
+b = 15;
+a + b;
+a % b;
+float c;
+c = a + b;
+c + a;
+c = a;
+c + 1.1;
+10 % a;
