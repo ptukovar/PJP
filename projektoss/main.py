@@ -17,34 +17,27 @@ def main(argv):
     else:
         visitor = VisitorInterp()
         code = visitor.visit(tree)
-     #   print(tree.toStringTree(recog=parser))
-        
-        fileta = open("output.txt", "w")
+        file = open("output.txt", "w")
        
-        happened = 0
+        inside = 0
         for i in range(len(code)):
-            if happened == 1:
-                happened = 0
+            if inside == 1:
+                inside = 0
                 continue
             if code[i] == 'uminus':
                 code[i] = code[i+1]
                 code[i+1] = 'uminus'
-                happened = 1
+                inside = 1
 
         for i in range(len(code)):
             if code[i] == 'pop' and 'load' in code[i-1] and 'save' in code[i-2] and 'save' in code[i+1] and 'load' in code[i+2]:
-                #remove this code[i]
                 for j in range(i, len(code)-1):
                     code[j] = code[j+1]
-                # smaller size of code
                 code.pop()
                 break
-                
-                
-
 
         for line in code:
-            fileta.write(str(line) + '\n')
+            file.write(str(line) + '\n')
 
         virtual = VirtualMachine()
         virtual.run(code)

@@ -113,7 +113,6 @@ class VisitorInterp(ExprVisitor):
 
     def visitAssignment(self, ctx: ExprParser.AssignmentContext):
         value = self.visit(ctx.expression())    
-        #cant float to int
         if self.symbol_table.getSymbol(ctx.variable().getText())[1] == Type.INT and type(value) == float:
             print("Error: Cannot assign float to int")
             return None
@@ -239,7 +238,7 @@ class VisitorInterp(ExprVisitor):
         for i in range(1, ctx.getChildCount()-1):
             if ctx.getChild(i).getText() == ',':
                 continue
-            value = input()
+            value = input("Enter value for " + ctx.getChild(i).getText() + ": ")
             type_ = self.symbol_table.getSymbol(ctx.getChild(i).getText())[1]
             if type_ == Type.INT:
                 self.machine.code.append('read I')
