@@ -2,6 +2,8 @@ from typing import Any, SupportsIndex
 from SymbolTable import SymbolTable
 from SymbolTable import Type
 
+#for
+#add float
 
 class VirtualMachine: 
     
@@ -95,7 +97,7 @@ class VirtualMachine:
                         jump = i
                         break
                 pc = jump
-        print(self.variables)
+        #print(self.variables)
 
     def execute(self,instr):
         if instr[0] == 'push':

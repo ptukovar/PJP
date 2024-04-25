@@ -24,7 +24,7 @@ class VisitorInterp(ExprVisitor):
     def visitProg(self, ctx:ExprParser.ProgContext):
             for i in range(ctx.getChildCount()):
                 self.visit(ctx.getChild(i))
-            self.checkAll()
+            #self.checkAll()
             return self.machine.code
     
     def checkAll(self):
@@ -58,12 +58,13 @@ class VisitorInterp(ExprVisitor):
         if type(right) == int and ctx.expression(0).getText().__contains__('.'):
                 self.machine.code.append('itof')
         if ctx.op.type == ExprParser.PLUS:
-            self.machine.code.append('add')
             if type(left) == str or type(right) == str:
                 print("Error: Cannot add string with number")
                 return ''
             if type(left) == float or type(right) == float:
+                self.machine.code.append('add F')
                 return self.toFloat(left) + self.toFloat(right)
+            self.machine.code.append('add I')
             return left + right
         if type(left) == str and type(right) == str:
             self.machine.code.append('concat')
@@ -71,9 +72,10 @@ class VisitorInterp(ExprVisitor):
         if type(left) == str or type(right) == str:
             print("Error: Cannot add string with number")
             return ''
-        self.machine.code.append('sub')
-        if type(left) == float or type(right) == float:
+        if type(left) == float or type(right) == float:   
+            self.machine.code.append('sub F')
             return self.toFloat(left) - self.toFloat(right)
+        self.machine.code.append('sub I')
         return left - right
         
     def visitMulDiv(self, ctx: ExprParser.MulDivContext):
@@ -84,14 +86,16 @@ class VisitorInterp(ExprVisitor):
         if type(right) == int and ctx.expression(0).getText().__contains__('.'):
                 self.machine.code.append('itof')
         if ctx.op.type == ExprParser.MULT:
-            self.machine.code.append('mul')
             if type(left) == float or type(right) == float:
+                self.machine.code.append('mul F')
                 return self.toFloat(left) * self.toFloat(right)
+            self.machine.code.append('mul I')
             return left * right
         if ctx.op.type == ExprParser.DIV:
-            self.machine.code.append('div')
             if type(left) == float or type(right) == float:
+                self.machine.code.append('div F')
                 return self.toFloat(left) / self.toFloat(right)
+            self.machine.code.append('div I')
             return left / right
         if type(left) == float or type(right) == float:
             print("Error: Cannot mod int by float")
@@ -138,9 +142,9 @@ class VisitorInterp(ExprVisitor):
             if ctx.getChild(i).getText() == ',':
                 continue
             count = count + 1
-            print(self.visit(ctx.getChild(i)), end=' ')
+            self.visit(ctx.getChild(i))
         self.machine.code.append('print '+str(count))
-        print()
+        #print()
         return None
     
     def visitVar(self, ctx: ExprParser.VarContext):
